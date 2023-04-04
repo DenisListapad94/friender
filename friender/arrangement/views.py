@@ -3,22 +3,32 @@ from django.http import HttpResponse
 from django.views import View
 import datetime
 
+friends = {
+    "Max": [34, "max@mail.ru"],
+    "Grigory": [32, "grigory@mail.ru"],
+    "Anna": [29, "anna@mail.ru"],
+    'Pedro': [21, "pedro@mail.ru"],
+    'Kate': [32, "kate@mail.ru"]
+}
+establishments = ['Butter bro', 'Terra', 'Golden Cafe', 'Pancakes', 'Depo']
+
 
 # функция представления (вьюшка)
-def current_datetime(request):
-    now = datetime.datetime.now()
-    html = f"<html><body>It is now {now}.</body></html>"
-    return HttpResponse(html)
 
 
-def greeting(request, name):
-    return HttpResponse(f"<h1>Hello {name}</h1>")
+def main_page(request):
+    return render(request, 'main.html')
 
 
-def year_archive(request, year):
-    return HttpResponse(f"headers: {year}")
+def place_arrangments(request):
+    context = {
+        "establishments": establishments,
+    }
+    return render(request, 'establishments.html', context=context)
 
 
-class Example(View):
-    def get(self,request, *args,**kwargs):
-        return HttpResponse(f"This is class base view")
+def all_friends(request):
+    context = {
+        "friends": friends,
+    }
+    return render(request, "friends.html", context=context)
