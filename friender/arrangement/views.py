@@ -32,3 +32,6 @@ def all_friends(request):
         "friends": friends,
     }
     return render(request, "friends.html", context=context)
+
+def static_url(request):
+    return render(request, "static_example.html")

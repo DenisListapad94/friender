@@ -6,4 +6,5 @@ urlpatterns = [
     path('main/', main_page, name="main"),
     path('friends/', all_friends, name="friends"),
     path('establishments/', place_arrangments, name="establishments"),
+    path('static_url/', static_url, name="static_url"),
 ]
