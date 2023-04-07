@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
+from .models import Users
 import datetime
 
-friends = {
-    "Max": [34, "max@mail.ru"],
-    "Grigory": [32, "grigory@mail.ru"],
-    "Anna": [29, "anna@mail.ru"],
-    'Pedro': [21, "pedro@mail.ru"],
-    'Kate': [32, "kate@mail.ru"]
-}
+
+# friends = {
+#     "Max": [34, "max@mail.ru"],
+#     "Grigory": [32, "grigory@mail.ru"],
+#     "Anna": [29, "anna@mail.ru"],
+#     'Pedro': [21, "pedro@mail.ru"],
+#     'Kate': [32, "kate@mail.ru"]
+# }
 establishments = ['Butter bro', 'Terra', 'Golden Cafe', 'Pancakes', 'Depo']
 
 
@@ -26,12 +28,13 @@ def place_arrangments(request):
     }
     return render(request, 'establishments.html', context=context)
 
-
 def all_friends(request):
     context = {
-        "friends": friends,
+        "friends": Users.objects.all(),
     }
     return render(request, "friends.html", context=context)
 
 def static_url(request):
     return render(request, "static_example.html")
+
+
