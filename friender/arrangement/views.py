@@ -4,7 +4,6 @@ from django.views import View
 from .models import Users
 import datetime
 
-
 # friends = {
 #     "Max": [34, "max@mail.ru"],
 #     "Grigory": [32, "grigory@mail.ru"],
@@ -16,7 +15,6 @@ establishments = ['Butter bro', 'Terra', 'Golden Cafe', 'Pancakes', 'Depo']
 
 
 # функция представления (вьюшка)
-
 
 def main_page(request):
     return render(request, 'main.html')
