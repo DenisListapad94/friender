@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
-from .models import Users
+from .models import *
 import datetime
 
 # friends = {
@@ -11,7 +11,7 @@ import datetime
 #     'Pedro': [21, "pedro@mail.ru"],
 #     'Kate': [32, "kate@mail.ru"]
 # }
-establishments = ['Butter bro', 'Terra', 'Golden Cafe', 'Pancakes', 'Depo']
+# establishments = ['Butter bro', 'Terra', 'Golden Cafe', 'Pancakes', 'Depo']
 
 
 # функция представления (вьюшка)
@@ -22,13 +22,16 @@ def main_page(request):
 
 def place_arrangments(request):
     context = {
-        "establishments": establishments,
+        "establishments": Establishments.objects.all(),
     }
     return render(request, 'establishments.html', context=context)
 
 def all_friends(request):
     context = {
-        "friends": Users.objects.all(),
+        # "friends": Users.objects.filter(age__gte=28).order_by('name')[:100],
+        # "friends": Users.objects.filter(name = 'Suzan')[:100],
+        "friends": Users.objects.filter(sex='f').order_by('-age')[:100],
+        # "friends": Users.objects.filter(age__gte=28).order_by('-sex')[:100],
     }
     return render(request, "friends.html", context=context)
 
