@@ -28,9 +28,11 @@ def place_arrangments(request):
 
 def all_friends(request):
     context = {
+
+        "friends": Users.objects.all().prefetch_related("hobbies_set","userrating_set")
         # "friends": Users.objects.filter(age__gte=28).order_by('name')[:100],
         # "friends": Users.objects.filter(name = 'Suzan')[:100],
-        "friends": Users.objects.filter(sex='f').order_by('-age')[:100],
+        # "friends": Users.objects.filter(sex='f').order_by('-age')[:100],
         # "friends": Users.objects.filter(age__gte=28).order_by('-sex')[:100],
     }
     return render(request, "friends.html", context=context)
@@ -39,3 +41,8 @@ def static_url(request):
     return render(request, "static_example.html")
 
 
+def user_rating(request):
+    context = {
+        "ratings": UserRating.objects.all().select_related('user')
+    }
+    return render(request, "userrating.html", context=context)

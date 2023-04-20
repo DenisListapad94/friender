@@ -1,5 +1,9 @@
 from django.db import models
+from django.db.models import F
 from datetime import datetime
+from django.core.signals import request_finished
+from django.db.models.signals import post_save,m2m_changed
+from django.dispatch import receiver
 
 SEX = [
     ('m', 'male'),
@@ -21,13 +25,19 @@ CATEGORY = [
 ]
 
 
+# @receiver(request_finished)
+# def my_callback(sender, **kwargs):
+#     print("Request finished!")
+
+
 class Users(models.Model):
-    name = models.CharField(max_length=100)
-    surname = models.CharField(max_length=100)
-    age = models.IntegerField()
-    sex = models.CharField(max_length=1, choices=SEX)
-    email = models.EmailField(null=True)
-    city = models.CharField(max_length=100, default='Minsk')
+    name = models.CharField(max_length=100,verbose_name='имя')
+    surname = models.CharField(max_length=100,verbose_name='фамилия')
+    age = models.IntegerField(verbose_name='возраст')
+    sex = models.CharField(max_length=1, choices=SEX,verbose_name='пол')
+    email = models.EmailField(null=True,verbose_name='почта')
+    city = models.CharField(max_length=100, default='Minsk',verbose_name='город')
+
     class Meta:
         indexes = [
             models.Index(fields=["age", "name"]),
@@ -35,9 +45,11 @@ class Users(models.Model):
             models.Index(fields=["-name"]),
             # models.Index(fields=["age"]),
             models.Index(fields=["-age"]),
-            models.Index(fields=["name",'-sex']),
+            models.Index(fields=["name", '-sex']),
             # models.Index(fields=["age", 'sex']),
         ]
+        verbose_name = 'Пользователи'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.name
@@ -48,6 +60,9 @@ class Host(Users):
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name_plural = 'Приглашающие'
+
 
 
 class Guest(Users):
@@ -56,7 +71,8 @@ class Guest(Users):
     def __str__(self):
         return self.name
 
-
+    class Meta:
+        verbose_name_plural = 'Гости'
 class Passport(models.Model):
     passport_id = models.CharField(max_length=10, unique=True)
     date_create = models.DateTimeField(auto_now=datetime.utcnow())
@@ -84,8 +100,8 @@ class Arrangements(models.Model):
 class Establishments(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=1, choices=CATEGORY)
-    address = models.CharField(max_length=100,null=True)
-    phone = models.CharField(max_length=100,null=True)
+    address = models.CharField(max_length=100, null=True)
+    phone = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return self.name
@@ -110,4 +126,16 @@ class UserRating(Rating):
     user = models.ForeignKey('Users', on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.user)
+        return str(self.rating)
+
+# @receiver(post_save, sender=Users)
+def user_created(sender, instance, **kwargs):
+    print('signal work')
+    print(sender)
+    print(instance)
+    print(instance.age)
+    hobby = Hobbies.objects.get(id=1)
+    instance.hobbies_set.add(hobby)
+
+#
+post_save.connect(receiver=user_created, sender=Users)
