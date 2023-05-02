@@ -9,6 +9,7 @@
       <th scope="col">name</th>
       <th scope="col">rating</th>
       <th scope="col">descriptions</th>
+        <th scope="col">photo</th>
     </tr>
   </thead>
   <tbody>
@@ -17,6 +18,8 @@
             <td>{{ rating.user.name}} {{rating.user.surname}} </td>
             <td>{{ rating.rating }}</td>
             <td>{{ rating.description}}</td>
+
+            <td>{% if rating.photo %} <img style="max-height: 100px" src="{{ rating.photo.url }}"/> {% endif %}</td>
         </tr>
     {% endfor %}
   </tbody>

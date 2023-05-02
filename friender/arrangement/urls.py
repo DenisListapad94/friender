@@ -10,4 +10,5 @@ urlpatterns = [
     path('user_rating/', user_rating, name="user_rating"),
     re_path(r"^user_rating/(?P<id>[\d-]+)$",user_form_rating,name="user_form_rating"),
     path('create_user/', create_user, name="create_user"),
+    path('make_arrangements/', make_arrangements, name="make_arrangements"),
 ]

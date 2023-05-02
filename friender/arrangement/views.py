@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.views import View
 from .models import *
 from .forms import *
+from django.db import transaction
 import datetime
 
 
@@ -30,9 +32,15 @@ def place_arrangments(request):
 
 
 def all_friends(request):
+    users = Users.objects.all().prefetch_related("hobbies_set", "userrating_set")
+    paginator = Paginator(users, 5)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
 
-        "friends": Users.objects.all().prefetch_related("hobbies_set", "userrating_set")
+        "friends": users,
+        "page_obj": page_obj
         # "friends": Users.objects.filter(age__gte=28).order_by('name')[:100],
         # "friends": Users.objects.filter(name = 'Suzan')[:100],
         # "friends": Users.objects.filter(sex='f').order_by('-age')[:100],
@@ -56,13 +64,14 @@ def user_form_rating(request, **kwargs):
     user_id = int(kwargs['id'])
     context = {}
     if request.method == "POST":
-        form = RatingUserForm(request.POST)
+        form = RatingUserForm(request.POST, request.FILES)
         context["form"] = form
         if form.is_valid():
             UserRating.objects.create(
                 user_id=user_id,
                 rating=request.POST['rating'],
-                description=request.POST['description']
+                description=request.POST['description'],
+                photo=request.FILES["photo"]
             )
             return redirect("friends")
     else:
@@ -73,6 +82,7 @@ def user_form_rating(request, **kwargs):
     #     "form" : form
     # }
     return render(request, "user_form_rating.html", context=context)
+
 
 def create_user(request):
     context = {}
@@ -85,8 +95,35 @@ def create_user(request):
     else:
         form = CreateUserForm()
         context["form"] = form
-    # context = {
-    #     # "user": Users.objects.get(id=user_id)
-    #     "form" : form
-    # }
     return render(request, "create_user_form.html", context=context)
+
+
+@transaction.atomic
+def make_arrangements(request):
+    context = {}
+    if request.method == "POST":
+        form = ArrangementForm(request.POST)
+        context["form"] = form
+        guest = Guest.objects.all().order_by('?')[0]
+        if form.is_valid():
+
+            host_id = int(request.POST['host'][0])
+            place_id = int(request.POST['place'][0])
+
+            host = Host.objects.get(users_ptr_id=host_id)
+            establishments = Establishments.objects.get(id=place_id)
+
+            if host.status == 'a':
+                host.status = 'b'
+                host.save()
+                Arrangements.objects.create(
+                    host=host,
+                    guest=Guest.objects.get(users_ptr_id=guest.id),
+                    establishments=establishments
+                )
+
+            return redirect("friends")
+    else:
+        form = ArrangementForm()
+        context["form"] = form
+    return render(request, "make_arrangement.html", context=context)

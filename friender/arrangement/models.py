@@ -5,6 +5,11 @@ from django.core.signals import request_finished
 from django.db.models.signals import post_save,m2m_changed
 from django.dispatch import receiver
 
+STATUS = [
+    ('a','available'),
+    ('b','busy')
+]
+
 SEX = [
     ('m', 'male'),
     ('f', 'female')
@@ -57,9 +62,11 @@ class Users(models.Model):
 
 class Host(Users):
     max_spend_value = models.PositiveIntegerField(null=True)
+    status = models.CharField(choices=STATUS, max_length=1,default='a')
+
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.max_spend_value})"
     class Meta:
         verbose_name_plural = 'Приглашающие'
 
@@ -69,7 +76,7 @@ class Guest(Users):
     min_bill_value = models.PositiveIntegerField(null=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.min_bill_value})"
 
     class Meta:
         verbose_name_plural = 'Гости'
@@ -97,6 +104,7 @@ class Arrangements(models.Model):
     establishments = models.ForeignKey('Establishments', on_delete=models.CASCADE)
 
 
+
 class Establishments(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=1, choices=CATEGORY)
@@ -104,7 +112,7 @@ class Establishments(models.Model):
     phone = models.CharField(max_length=100, null=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
 
 class Rating(models.Model):
@@ -124,6 +132,7 @@ class EstablishmentsRating(Rating):
 
 class UserRating(Rating):
     user = models.ForeignKey('Users', on_delete=models.CASCADE)
+    photo = models.ImageField(upload_to="photo_ratings",null = True)
 
     def __str__(self):
         return str(self.rating)
