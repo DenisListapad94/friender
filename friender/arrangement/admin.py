@@ -57,10 +57,23 @@ class UsersAdmin(admin.ModelAdmin):
     ]
     actions = [change_city,year_later]
 
+@admin.display(description='фото')
+def get_html_photo(objects):
+    if objects.photo:
+        return mark_safe(f'<img src={objects.photo.url} width=50>')
+@admin.register(UserRating)
+class UserRatingAdmin(admin.ModelAdmin):
+
+
+    # get_html_photo.short_descriptions = 'фото'
+
+    list_display = ["rating", "user", get_html_photo]
+    list_display_links = ['rating', 'user']
+
 
 
 # admin.site.register(Users,UsersAdmin)
-admin.site.register(UserRating)
+# admin.site.register(UserRating)
 admin.site.register(Hobbies)
 admin.site.register(Establishments)
 admin.site.register(EstablishmentsRating)

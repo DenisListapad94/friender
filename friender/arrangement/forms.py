@@ -15,6 +15,11 @@ class RatingUserForm(forms.ModelForm):
     class Meta:
         model = UserRating
         exclude = ("user",)
+
+class EstablishmentCreateForm(forms.ModelForm):
+    class Meta:
+        model = Establishments
+        fields = ("name","category","address","phone")
 # class RatingUserForm(forms.Form):
 #     rating = forms.IntegerField(validators=[
 #         MaxValueValidator(5, message='input rating between 1 and 5'),

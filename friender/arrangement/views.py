@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views import View
 from .models import *
 from .forms import *
 from django.db import transaction
+from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView
 import datetime
+
 
 
 # friends = {
@@ -24,11 +29,7 @@ def main_page(request):
     return render(request, 'main.html')
 
 
-def place_arrangments(request):
-    context = {
-        "establishments": Establishments.objects.all(),
-    }
-    return render(request, 'establishments.html', context=context)
+
 
 
 def all_friends(request):
@@ -98,6 +99,9 @@ def create_user(request):
     return render(request, "create_user_form.html", context=context)
 
 
+
+
+
 @transaction.atomic
 def make_arrangements(request):
     context = {}
@@ -127,3 +131,26 @@ def make_arrangements(request):
         form = ArrangementForm()
         context["form"] = form
     return render(request, "make_arrangement.html", context=context)
+
+class PlaceListView(ListView):
+    template_name = 'establishments.html'
+    model = Establishments
+    context_object_name = "establishments"
+    queryset = Establishments.objects.all()[:4]
+
+
+class EstablishmentsCreateView(CreateView):
+        template_name = 'createplace.html'
+        model = Establishments
+        fields = ["name", "category", "address", "phone"]
+        success_url = reverse_lazy("establishments")
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context["establishments"] = Establishments.objects.all()
+    #     return context
+
+# def place_arrangments(request):
+#     context = {
+#         "establishments": Establishments.objects.all(),
+#     }
+#     return render(request, 'establishments.html', context=context)
