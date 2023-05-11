@@ -19,8 +19,11 @@
             <td>{{ rating.rating }}</td>
             <td>{{ rating.description}}</td>
 
-            <td>{% if rating.photo %} <img style="max-height: 100px" src="{{ rating.photo.url }}"/> {% endif %}</td>
-        </tr>
+            <td>
+                {% if rating.photo %}
+                     <img style="max-height: 100px" src="{{ rating.photo.url }}"/>
+                {% endif %}</td>
+            </tr>
     {% endfor %}
   </tbody>
 </table>

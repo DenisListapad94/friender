@@ -6,7 +6,10 @@ from .serializers import EstablishmentsSerializer
 from rest_framework import status
 from django.http import Http404
 from rest_framework import generics
-
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 # class EstablishmentsAPIView(APIView):
 #
 #     def get_object(self, pk):
@@ -36,9 +39,25 @@ from rest_framework import generics
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EstablishmentsListAPIView(generics.ListCreateAPIView):
+    # authentication_classes = [BasicAuthentication]
+    # permission_classes = [IsAuthenticated]
     queryset = Establishments.objects.all()
     serializer_class = EstablishmentsSerializer
 
 class EstablishmentsListAPIViewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Establishments.objects.all()
     serializer_class = EstablishmentsSerializer
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })

@@ -9,8 +9,14 @@ from django.db import transaction
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
-import datetime
+from django.contrib.auth.models import Permission
+from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
+
+
+
+import datetime
 
 
 # friends = {
@@ -24,14 +30,12 @@ import datetime
 
 
 # функция представления (вьюшка)
-
+#
+@login_required(login_url="/admin/login/")
 def main_page(request):
     return render(request, 'main.html')
 
-
-
-
-
+@permission_required('arrangement.view_users',login_url="/arrangement/main")
 def all_friends(request):
     users = Users.objects.all().prefetch_related("hobbies_set", "userrating_set")
     paginator = Paginator(users, 5)
@@ -99,9 +103,6 @@ def create_user(request):
     return render(request, "create_user_form.html", context=context)
 
 
-
-
-
 @transaction.atomic
 def make_arrangements(request):
     context = {}
@@ -132,6 +133,7 @@ def make_arrangements(request):
         context["form"] = form
     return render(request, "make_arrangement.html", context=context)
 
+
 class PlaceListView(ListView):
     template_name = 'establishments.html'
     model = Establishments
@@ -139,15 +141,16 @@ class PlaceListView(ListView):
     queryset = Establishments.objects.all()[:4]
 
 
-class EstablishmentsCreateView(CreateView):
-        template_name = 'createplace.html'
-        model = Establishments
-        fields = ["name", "category", "address", "phone"]
-        success_url = reverse_lazy("establishments")
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context["establishments"] = Establishments.objects.all()
-    #     return context
+class EstablishmentsCreateView(LoginRequiredMixin,CreateView):
+    template_name = 'createplace.html'
+    login_url = "/admin/login/"
+    model = Establishments
+    fields = ["name", "category", "address", "phone"]
+    success_url = reverse_lazy("establishments")
+# def get_context_data(self, **kwargs):
+#     context = super().get_context_data(**kwargs)
+#     context["establishments"] = Establishments.objects.all()
+#     return context
 
 # def place_arrangments(request):
 #     context = {
