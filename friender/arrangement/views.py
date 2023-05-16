@@ -1,3 +1,5 @@
+from time import sleep
+
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
@@ -6,15 +8,14 @@ from django.views import View
 from .models import *
 from .forms import *
 from django.db import transaction
+from django.views.decorators.cache import cache_page
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.models import Permission
 from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-
-
+from django.core.cache import cache, caches
 
 import datetime
 
@@ -34,10 +35,11 @@ import datetime
 @login_required(login_url="/admin/login/")
 def main_page(request):
     return render(request, 'main.html')
-
+@cache_page(60, cache="userlist")
 @permission_required('arrangement.view_users',login_url="/arrangement/main")
 def all_friends(request):
-    users = Users.objects.all().prefetch_related("hobbies_set", "userrating_set")
+    sleep(10)
+    users = Users.objects.all().prefetch_related("hobbies_set", "userrating_set").order_by("id")
     paginator = Paginator(users, 5)
 
     page_number = request.GET.get('page')
@@ -96,7 +98,9 @@ def create_user(request):
         context["form"] = form
         if form.is_valid():
             form.save()
-            return redirect("friends")
+            caches["userlist"].clear()
+            return redirect("main")
+
     else:
         form = CreateUserForm()
         context["form"] = form
@@ -135,6 +139,7 @@ def make_arrangements(request):
 
 
 class PlaceListView(ListView):
+    sleep(10)
     template_name = 'establishments.html'
     model = Establishments
     context_object_name = "establishments"

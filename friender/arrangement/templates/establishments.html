@@ -4,6 +4,8 @@
 
 {% block content %}
     <table class="table table-striped table-bordered">
+        {% load cache %}
+        {% cache 10800 sidebar %}
   <thead>
     <tr>
       <th scope="col">name</th>
@@ -12,6 +14,7 @@
       <th scope="col">phone</th>
     </tr>
   </thead>
+        {% endcache %}
   <tbody>
     {% for establishment in establishments %}
         <tr>

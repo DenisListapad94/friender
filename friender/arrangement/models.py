@@ -4,6 +4,7 @@ from datetime import datetime
 from django.core.signals import request_finished
 from django.db.models.signals import post_save,m2m_changed
 from django.dispatch import receiver
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 STATUS = [
     ('a','available'),
@@ -116,12 +117,16 @@ class Establishments(models.Model):
 
 
 class Rating(models.Model):
-    rating = models.PositiveIntegerField()
+    rating = models.PositiveIntegerField(
+        validators=[
+            MaxValueValidator(5, message='input rating between 1 and 5'),
+            MinValueValidator(1, message='input rating between 1 and 5')
+        ]
+    )
     description = models.CharField(max_length=255)
 
     class Meta:
         abstract = True
-
 
 class EstablishmentsRating(Rating):
     establishment = models.ForeignKey('Establishments', on_delete=models.CASCADE)
