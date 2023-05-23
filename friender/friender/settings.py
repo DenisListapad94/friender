@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     "crispy_bootstrap5",
     'rest_framework',
     'friender_api.apps.FrienderApiConfig',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'django_celery_results',
+    "django_celery_beat",
 
 ]
 
@@ -167,8 +169,28 @@ CACHES = {
     "userlist": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "userlist_cache_table",
-    }
+    },
+    'celery_cache': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    },
+    # "celery_cache": {
+    #     "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    #     "LOCATION": "redis://username:password@127.0.0.1:6379/1",
+    # }
 }
+
+#celery
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'celery_cache'
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = '6379'
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + '/0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+# CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + '/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # drf config
 REST_FRAMEWORK = {

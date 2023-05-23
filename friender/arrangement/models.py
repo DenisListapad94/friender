@@ -137,7 +137,7 @@ class EstablishmentsRating(Rating):
 
 class UserRating(Rating):
     user = models.ForeignKey('Users', on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to="photo_ratings",null = True)
+    photo = models.ImageField(upload_to="photo_ratings",null = True,blank=True)
 
     def __str__(self):
         return str(self.rating)

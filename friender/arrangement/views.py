@@ -1,5 +1,6 @@
+import base64
 from time import sleep
-
+import requests
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.urls import reverse_lazy
@@ -13,10 +14,12 @@ from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.models import Permission
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache, caches
 
+from .tasks import *
+from django.core.files.base import ContentFile
 import datetime
 
 
@@ -35,10 +38,11 @@ import datetime
 @login_required(login_url="/admin/login/")
 def main_page(request):
     return render(request, 'main.html')
+
+
 @cache_page(60, cache="userlist")
-@permission_required('arrangement.view_users',login_url="/arrangement/main")
+@permission_required('arrangement.view_users', login_url="/arrangement/main")
 def all_friends(request):
-    sleep(10)
     users = Users.objects.all().prefetch_related("hobbies_set", "userrating_set").order_by("id")
     paginator = Paginator(users, 5)
 
@@ -74,12 +78,17 @@ def user_form_rating(request, **kwargs):
         form = RatingUserForm(request.POST, request.FILES)
         context["form"] = form
         if form.is_valid():
-            UserRating.objects.create(
-                user_id=user_id,
-                rating=request.POST['rating'],
-                description=request.POST['description'],
-                photo=request.FILES["photo"]
-            )
+            if 'photo' in request.FILES:
+                rating_user = UserRating(
+                    user_id=user_id,
+                    rating=request.POST['rating'],
+                    description=request.POST['description'],
+                    photo=request.FILES["photo"]
+                )
+                rating_user.save()
+            else:
+                generate_photo.delay(user_id, request.POST['rating'],
+                                     request.POST['description'])
             return redirect("friends")
     else:
         form = RatingUserForm()
@@ -146,7 +155,7 @@ class PlaceListView(ListView):
     queryset = Establishments.objects.all()[:4]
 
 
-class EstablishmentsCreateView(LoginRequiredMixin,CreateView):
+class EstablishmentsCreateView(LoginRequiredMixin, CreateView):
     template_name = 'createplace.html'
     login_url = "/admin/login/"
     model = Establishments
