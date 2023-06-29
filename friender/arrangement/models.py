@@ -153,3 +153,7 @@ def user_created(sender, instance, **kwargs):
 
 #
 post_save.connect(receiver=user_created, sender=Users)
+
+class PlaceQueue(models.Model):
+    value = models.PositiveIntegerField(verbose_name="значение")
+

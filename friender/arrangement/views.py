@@ -124,13 +124,13 @@ def make_arrangements(request):
         context["form"] = form
         guest = Guest.objects.all().order_by('?')[0]
         if form.is_valid():
-
-            host_id = int(request.POST['host'][0])
-            place_id = int(request.POST['place'][0])
+            print(form.cleaned_data)
+            host_id = int(form.cleaned_data['host'])
+            place_id = int(form.cleaned_data['place'])
 
             host = Host.objects.get(users_ptr_id=host_id)
+            # host = form
             establishments = Establishments.objects.get(id=place_id)
-
             if host.status == 'a':
                 host.status = 'b'
                 host.save()
