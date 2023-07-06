@@ -10,6 +10,7 @@ jobs:
       - name: Print to console
         run: echo Hello GH Actions! ${{env.DJANGO_ENV}}
   output_2:
+    needs: output_1
     runs-on: ubuntu-latest
     env:
       DJANGO_ENV: DJANGO_TOKEN_ACCESS
