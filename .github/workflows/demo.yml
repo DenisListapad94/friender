@@ -1,14 +1,17 @@
 name: Demo CI
 on: workflow_dispatch
+env:
+  DJANGO_ENV: DJANGO_TOKEN
+  ENV_GHA: SETTINGS
 jobs:
   output:
     runs-on: ubuntu-latest
     steps:
       - name: Print to console
-        run: echo Hello GH Actions!
+        run: echo Hello GH Actions! ${{env.DJANGO_ENV}}
       - name: Print some string into console
         run: |
           echo first string in second step!
-          echo second string in second step!
-          echo third string in second step!
+          echo second string in second step! ${{env.DJANGO_ENV}}
+          echo third string in second step! ${{env.ENV_GHA}}
 
