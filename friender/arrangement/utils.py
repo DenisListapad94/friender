@@ -15,9 +15,13 @@ class Queue:
     def add(self, value):
         PlaceQueue.objects.create(value=value)
     def pop(self):
+        val = None
         if self.strategy == self.FIFO:
             val = PlaceQueue.objects.order_by("id").first()
+
         elif self.strategy == self.LIFO:
             val = PlaceQueue.objects.order_by("id").last()
-        val.delete()
-        return val.value
+        if val:
+            val.delete()
+            return val.value
+        return None

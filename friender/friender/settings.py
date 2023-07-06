@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 
@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'friender.middleware.simple_middleware'
+    # 'friender.middleware.simple_middleware'
 ]
 
 ROOT_URLCONF = 'friender.urls'
@@ -101,11 +101,11 @@ WSGI_APPLICATION = 'friender.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'friender',
-        'USER': 'friender',
-        'PASSWORD': 'friender',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.environ.get("DB_NAME",'friender'),
+        'USER': os.environ.get("DB_USER",'friender'),
+        'PASSWORD': os.environ.get("DB_PASSWORD",'friender'),
+        'HOST': os.environ.get("DB_HOST",'127.0.0.1'),
+        'PORT': os.environ.get("DB_PORT",'5432'),
         "TEST": {
             "NAME": "test_arrangements",
         },
