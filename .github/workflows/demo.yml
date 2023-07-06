@@ -1,0 +1,9 @@
+name: Demo CI
+on: workflow_dispatch
+jobs:
+  output:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print to console
+        run: echo Hello GH Actions!
+
