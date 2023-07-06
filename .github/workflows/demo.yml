@@ -6,4 +6,9 @@ jobs:
     steps:
       - name: Print to console
         run: echo Hello GH Actions!
+      - name: Print some string into console
+        run: |
+          echo first string in second step!
+          echo second string in second step!
+          echo third string in second step!
 
